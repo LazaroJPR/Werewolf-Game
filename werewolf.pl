@@ -144,7 +144,7 @@ executarAcao(Jogador, matar, JogadorAleatorio) :-
     jogadorStatus(JogadorAleatorio, vivo),  % Verificacao para saber se o jogador não está morto nem está protegido
     atualizarStatusJogador(JogadorAleatorio, morto),
     acaoCacador(JogadorAleatorio),
-    acaoIdiota(JogadorAleatorio,)
+    acaoIdiota(JogadorAleatorio),
     write('Jogador '), write(Jogador), write(' realizou sua acao.'), nl.
 
 executarAcao(Jogador, escolherOutro, JogadorAleatorio) :-
@@ -163,7 +163,7 @@ realizarAoes():-
 % INTERFACE
 % -------------------------------------------------------------------------
 % --> Realiza cada rodada
-rodadas:-
+rodadas :-
     writeln('========================================================================================'),
     lua,
     write('A noite chegou, os aldeões foram para suas casas, o que poderá acontecer nesta noite? '), nl,
@@ -175,6 +175,8 @@ rodadas:-
     write('Com esse caos que acoteceu esta noite, precisamos fazer uma votação para eliminar o nosso problema, o lobisomem! '), nl,
     %FAZER PARTE DA VOTACAO
     %FAZER PARTE DA FINALIZACAO DO JOGO
+    %SOL É SÓ PRA FECHAR A FUNCAO
+    sol.
 
 % Exibir o menu
 exibir_menu :-
@@ -200,42 +202,42 @@ menu :-
     fail.
 
 lua :-
-    writeln('o                     __...__     *                '),
-    writeln('              *   .--     __.=-.             o     '),
-    writeln('     |          ./     .-                          '),
-    writeln('    -O-        /      /                            '),
-    writeln('     |        /     "/               *             '),
-    writeln('             |     (@)                             '),
-    writeln('            |        \                         .   '),
-    writeln('            |         \                            '),
-    writeln(' *          |       ___\                  |        '),
-    writeln('             |  .   /  `                 -O-       '),
-    writeln('              \  `~~\                     |        '),
-    writeln('         o     \     \            *                '),
-    writeln('                `\    `-.__           .            '),
-    writeln('    .             `--._    `--                     '),
-    writeln('                       `---~~`                *    '),
-    writeln('            *                   o                  '),
+    writeln('o                     __...__     *                    '),
+    writeln('              *   .--     __.=-.             o         '),
+    writeln('     |          ./     .-                              '),
+    writeln('    -O-        /      /                                '),
+    writeln('     |        /     "/               *                 '),
+    writeln('             |     (@)                                 '),
+    writeln('            |        \\                         .      '),
+    writeln('            |         \\                               '),
+    writeln(' *          |       ___\\                  |           '),
+    writeln('             |  .   /  `                 -O-           '),
+    writeln('              \\  `~~\\                     |          '),
+    writeln('         o     \\     \\            *                  '),
+    writeln('                `\\    `-.__           .               '),
+    writeln('    .             `--._    `--                         '),
+    writeln('                       `---~~`                *        '),
+    writeln('            *                   o                      ').
 
 sol :-
-    writeln('        \     (      /         '),
-    writeln('   `.    \     )    /    .     '),
-    writeln('     `.   \   (    /   .       '),
-    writeln('       `.  .-''''-.  .         '),
-    writeln(' `~._    . /_    _\`.    _.~   '),
-    writeln('     `~ /  / \  / \  \ ~       '),
-    writeln('_ _ _ _|  _\O/  \O/_  |_ _ _ _ '),
-    writeln('       | (_)  /\  (_) |        '),
-    writeln('    _.~ \  \      /  / ~._     '),
-    writeln(' .~      `. `.__. .      `~.   '),
-    writeln('       .'  `-,,,,-'  `.        '),
-    writeln('     .    /    )   \   `.      '),
-    writeln('   .     /    (     \    `.    '),
-    writeln('        /      )     \         '),
-    writeln('              (                '),
+    writeln('        \\     (      /            '),
+    writeln('   `.    \\     )    /    .        '),
+    writeln('     `.   \\   (    /   .          '),
+    writeln('       `.  .-''''-.  .             '),
+    writeln(' `~._    . /_    _\\`.    _.~      '),
+    writeln('     `~ /  / \\  / \\  \\ ~        '),
+    writeln('_ _ _ _|  _\\O/  \\O/_  |_ _ _ _   '),
+    writeln('       | (_)  /\\  (_) |           '),
+    writeln('    _.~ \\  \\      /  / ~._       '),
+    writeln(' .~      `. `.__. .      `~.       '),
+    writeln('       .   `-,,,,-   `.            '),
+    writeln('     .    /    )   \\   `.         '),
+    writeln('   .     /    (     \\    `.       '),
+    writeln('        /      )     \\            '),
+    writeln('              (                    ').
 
 iniciar :-
-        writeln(' __      ____________________________________      __________  .____   ___________         '),
+    writeln(' __      ____________________________________      __________  .____   ___________             '),
     writeln('/  \\    /  \\_   _____/\\______   \\_   _____/  \\    /  \\_____  \\ |    |  \\_   _____/     '),
     writeln('\\   \\/\\/   /|    __)_  |       _/|    __)_\\   \\/\\/   //   |   \\|    |   |    __)        '),
     writeln(' \\        / |        \\ |    |   \\|        \\        //    |    \\    |___|     \\           '),
