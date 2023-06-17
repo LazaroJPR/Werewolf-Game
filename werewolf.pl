@@ -12,6 +12,7 @@ grupos([curandeiro, vidente, aldeao, idiota, cacador, lobisomem]).
 % --> Predicativo dinâmico do jogadorStatus
 :- dynamic jogadorStatus/2.
 
+% --> Predicativo dinâmico dos votos
 :- dynamic voto/2.
 
 % --> Açõess
