@@ -9,6 +9,9 @@ grupos([curandeiro, vidente, aldeao, idiota, cacador, lobisomem]).
 % --> Predicativo dinâmico do jogadorGrupo
 :- dynamic jogadorGrupo/2.
 
+% --> Predicativo dinâmico do jogadorStatus
+:- dynamic jogadorStatus/2.
+
 % --> Açõess
 acao(nada, aldeao).
 acao(proteger, curandeiro).
@@ -21,28 +24,6 @@ acao(eliminar, cacador).
 status(vivo).
 status(morto).
 status(protegido).
-
-% --> Status do jogador
-jogadorStatus(jogador01, vivo).
-jogadorStatus(jogador02, vivo).
-jogadorStatus(jogador03, vivo).
-jogadorStatus(jogador04, vivo).
-jogadorStatus(jogador05, vivo).
-jogadorStatus(jogador06, vivo).
-jogadorStatus(jogador07, vivo).
-jogadorStatus(jogador08, vivo).
-jogadorStatus(jogador09, vivo).
-jogadorStatus(jogador10, vivo).
-jogadorStatus(jogador11, vivo).
-jogadorStatus(jogador12, vivo).
-jogadorStatus(jogador13, vivo).
-jogadorStatus(jogador14, vivo).
-jogadorStatus(jogador15, vivo).
-jogadorStatus(jogador16, vivo).
-jogadorStatus(jogador17, vivo).
-jogadorStatus(jogador18, vivo).
-jogadorStatus(jogador19, vivo).
-jogadorStatus(jogador20, vivo).
 
 % FUNÇÕES
 % -------------------------------------------------------------------------
@@ -81,10 +62,21 @@ imprimirRelacoes([Jogador-Grupo|Resto]) :-
     imprimirRelacoes(Resto).
 
 % --> Imprime os jogadores e seus status
+imprimirJogadoresStatus.
 imprimirJogadoresStatus :-
     jogadorStatus(Jogador, Status),
     write('Jogador: '), write(Jogador), write(' - Status: '), write(Status), nl,
     fail.
+
+% --> Coloca todos os status dos jogadores como vivo
+atualizarStatusVivo :-
+    jogadores(ListaJogadores),
+    atualizarStatusVivoLista(ListaJogadores).
+
+atualizarStatusVivoLista([]).
+atualizarStatusVivoLista([Jogador|Resto]) :-
+    assertz(jogadorStatus(Jogador, vivo)),
+    atualizarStatusVivoLista(Resto).
 
 %  --> atualiza o status do jogador
 atualizarStatusJogador(Jogador, NovoStatus) :-
@@ -98,48 +90,59 @@ atualizarGrupoJogador(Jogador, NovoGrupo) :-
 
 %  --> executa a ação do jogador e chama recursivamente para os próximos jogadores
 todosJogadoresAcaoRealizada([]).
-todosJogadoresAcaoRealizada([Jogador | OutrosJogadores]) :-
-    jogadorStatus(Jogador, vivo),
+
+todosJogadoresAcaoRealizada([Jogador]) :-
     jogadorGrupo(Jogador, Grupo),
     acao(Acao, Grupo),
-    random_permutation(OutrosJogadores, JogadoresEmbaralhados),
-    select(JogadorAleatorio, JogadoresAleatorios, NovosOutrosJogadores),
+    executarAcao(Jogador, Acao, Jogador).
+
+todosJogadoresAcaoRealizada([Jogador | OutrosJogadores]) :-
+    jogadorGrupo(Jogador, Grupo),
+    acao(Acao, Grupo),
+    random_permutation(OutrosJogadores, [JogadorAleatorio | NovosOutrosJogadores]),
     executarAcao(Jogador, Acao, JogadorAleatorio),
     todosJogadoresAcaoRealizada([JogadorAleatorio | NovosOutrosJogadores]).
 
 %  --> Altera o status de todos os jogadores protegidos para vivos
 retirarProtecao([]).
 retirarProtecao([Jogador | OutrosJogadores]) :-
-    atualizarStatusJogador(JogadorEscolhido, vivo),
+    atualizarStatusJogador(Jogador, vivo),
     retirarProtecao(OutrosJogadores).
 
-%  --> Acao específica de quando um cacador morre
+% --> Regras para executar uma ação específica para cada jogador
+%  --> Ação específica de quando um cacador morre
+acaoCacador(_).
 acaoCacador(Jogador):-
-    	jogadorGrupo(Jogador, cacador),
-        findall(Jogador, jogadorStatus(Jogador, vivo), JogadoresVivos),
-        random_permutation(JogadoresVivos, [JogadorEscolhido | OutrosJogadores]),
-        atualizarStatusJogador(JogadorEscolhido, morto),
-        write('Jogador '), write(Jogador), write(' era um cacador e morreu levando o jogador '),  write(JogadorEscolhido), write(' junto.'), nl. 
-
-%  --> Acao específica de quando um idiota morre
-acaoIdiota(Jogador) :-
-    jogador(Jogador, idiota),
+    jogadorGrupo(Jogador, cacador),
     findall(Jogador, jogadorStatus(Jogador, vivo), JogadoresVivos),
-    random_permutation(JogadoresVivos, [JogadorEscolhido | OutrosJogadores]),
+    random_permutation(JogadoresVivos, [JogadorEscolhido | _]),
+    atualizarStatusJogador(JogadorEscolhido, morto),
+    write('Jogador '), write(Jogador), write(' era um cacador e morreu levando o jogador '),  write(JogadorEscolhido), write(' junto.'), nl. 
+
+%  --> Ação específica de quando um idiota morre
+acaoIdiota(_).
+acaoIdiota(Jogador) :-
+    jogadorGrupo(Jogador, idiota),
+    findall(Jogador, jogadorStatus(Jogador, vivo), JogadoresVivos),
+    random_permutation(JogadoresVivos, [JogadorEscolhido | _]),
     atualizarGrupoJogador(JogadorEscolhido, idiota),
     write('Jogador '), write(Jogador), write(' era um idiota e morreu mudando o grupo de outro jogador para idiota'), nl. 
 
-% --> Regras para executar uma ação específica para cada jogador
-executarAcao(Jogador, nada, JogadorAleatorio) :-
+% --> Ação específica do aldeao
+executarAcao(Jogador, nada, _) :-
     write('Jogador '), write(Jogador), write(' realizou sua acao.'), nl.
 
+% --> Ação específica do curandeiro
 executarAcao(Jogador, proteger, JogadorAleatorio) :-
     atualizarStatusJogador(JogadorAleatorio, protegido),
     write('Jogador '), write(Jogador), write(' realizou sua acao.'), nl.    
 
+% --> Ação específica do vidente
 executarAcao(Jogador, verificar, JogadorAleatorio) :-
-    write('Jogador '), write(Jogador), write(' verificou o jogador '), write(JogadorAleatorio), write(' e ele é um '), write(jogadorGrupo(JogadorAleatorio, X)), nl.
+    jogadorGrupo(JogadorAleatorio, Grupo),
+    write('Jogador '), write(Jogador), write(' verificou o jogador '), write(JogadorAleatorio), write(' e ele e um '), write(Grupo), nl.
 
+% --> Ação específica do lobisomem
 executarAcao(Jogador, matar, JogadorAleatorio) :-
     jogadorStatus(JogadorAleatorio, vivo),  % Verificacao para saber se o jogador não está morto nem está protegido
     atualizarStatusJogador(JogadorAleatorio, morto),
@@ -147,14 +150,16 @@ executarAcao(Jogador, matar, JogadorAleatorio) :-
     acaoIdiota(JogadorAleatorio),
     write('Jogador '), write(Jogador), write(' realizou sua acao.'), nl.
 
-executarAcao(Jogador, escolherOutro, JogadorAleatorio) :-
+% --> Ação específica do idiota
+executarAcao(Jogador, escolherOutro, _) :-
     write('Jogador '), write(Jogador), write(' realizou sua acao.'), nl.
 
-executarAcao(Jogador, eliminar, JogadorAleatorio) :-
+% --> Ação específica do caçador
+executarAcao(Jogador, eliminar, _) :-
     write('Jogador '), write(Jogador), write(' realizou sua acao.'), nl.
 
 % --> Chama a execução das ações de todos os jogadores
-realizarAoes():-
+realizarAcoes():-
     findall(Jogador, jogadorStatus(Jogador, vivo), JogadoresVivos),
     todosJogadoresAcaoRealizada(JogadoresVivos),
     findall(Jogador, jogadorStatus(Jogador, protegido), JogadoresProtegidos),
@@ -166,13 +171,13 @@ realizarAoes():-
 rodadas :-
     writeln('========================================================================================'),
     lua,
-    write('A noite chegou, os aldeões foram para suas casas, o que poderá acontecer nesta noite? '), nl,
+    write('A noite chegou, os aldeoes foram para suas casas, o que podera acontecer nesta noite? '), nl, nl,
     realizarAcoes,
     writeln('========================================================================================'),
     sol,
     write('A noite passou, vamos ver o que aconteceu? '), nl,
     imprimirJogadoresStatus,
-    write('Com esse caos que acoteceu esta noite, precisamos fazer uma votação para eliminar o nosso problema, o lobisomem! '), nl,
+    write('Com esse caos que acoteceu esta noite, precisamos fazer uma votacao para eliminar o nosso problema, o lobisomem! '), nl,
     %FAZER PARTE DA VOTACAO
     %FAZER PARTE DA FINALIZACAO DO JOGO
     %SOL É SÓ PRA FECHAR A FUNCAO
@@ -187,12 +192,15 @@ exibir_menu :-
 
 % Menu
 menu :-
-    repeat,
+    %repeat,
     exibir_menu,
     read(Opcao),
     (Opcao = 1 ->(
             gerarRelacao,
-            imprimirJogadores
+            atualizarStatusVivo,
+            %imprimirJogadoresStatus,
+            imprimirJogadores,
+            rodadas
         );
      Opcao = 2 -> halt;
      write('Opcao invalida!'), nl
